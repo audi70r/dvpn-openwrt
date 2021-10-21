@@ -1,13 +1,18 @@
 package main
 
 import (
+	"context"
 	"embed"
+	"fmt"
+	"github.com/gorilla/mux"
 	"github.com/solarlabsteam/dvpn-openwrt/controllers"
-	"github.com/solarlabsteam/dvpn-openwrt/services/auth"
 	"github.com/solarlabsteam/dvpn-openwrt/services/socket"
+	"github.com/solarlabsteam/dvpn-openwrt/utilities/appconf"
 	"io/fs"
+	"log"
 	"net/http"
 	"os"
+	"os/signal"
 )
 
 //go:embed public
@@ -15,9 +20,14 @@ import (
 var public embed.FS
 
 func main() {
+	// load config
+	appconf.LoadConf()
+
+	r := mux.NewRouter()
+
 	if _, homeSet := os.LookupEnv("HOME"); !homeSet {
-		os.Setenv("PATH", "/usr/sbin:/usr/bin:/sbin:/bin:")
-		os.Setenv("HOME", "/root")
+		os.Setenv("PATH", appconf.Paths.BinDir)
+		os.Setenv("HOME", appconf.Paths.HomeDir)
 	}
 	// for development: serve static assets from public folder
 	//publicFS := http.FileServer(http.Dir("./public"))
@@ -26,16 +36,47 @@ func main() {
 	publicDir, _ := fs.Sub(public, "public")
 	publicFS := http.FileServer(http.FS(publicDir))
 
-	http.Handle("/", auth.BasicAuthForHandler(publicFS)) // serve embedded static assets
-	http.HandleFunc("/api/node/start/stream", auth.BasicAuth(controllers.StartNodeStreamStd))
-	http.HandleFunc("/api/node", auth.BasicAuth(controllers.GetNode))
-	http.HandleFunc("/api/node/kill", auth.BasicAuth(controllers.KillNode))
-	http.HandleFunc("/api/config", auth.BasicAuth(controllers.Config))
-	http.HandleFunc("/api/socket", auth.BasicAuth(socket.Handle))
-	http.HandleFunc("/api/keys", auth.BasicAuth(controllers.ListKeys))
-	http.HandleFunc("/api/keys/add", auth.BasicAuth(controllers.AddRecoverKeys))
+	r.PathPrefix("/").Handler(publicFS) // serve embedded static assets
+	r.HandleFunc("/api/node/start/stream", controllers.StartNodeStreamStd)
+	r.HandleFunc("/api/node", controllers.GetNode)
+	r.HandleFunc("/api/node/kill", controllers.KillNode)
+	r.HandleFunc("/api/config", controllers.Config)
+	r.HandleFunc("/api/socket", socket.Handle)
+	r.HandleFunc("/api/keys", controllers.ListKeys)
+	r.HandleFunc("/api/keys/add", controllers.AddRecoverKeys)
 
-	if err := http.ListenAndServe(":9000", nil); err != nil {
-		panic("failed to start server")
+	srv := &http.Server{
+		Addr:         fmt.Sprintf("%v:%v", appconf.Server.Addr, appconf.Server.Port),
+		WriteTimeout: appconf.Server.WriteTimeout,
+		ReadTimeout:  appconf.Server.ReadTimeout,
+		IdleTimeout:  appconf.Server.IdleTimeout,
+		Handler:      r,
 	}
+
+	// Run our server in a goroutine so that it doesn't block.
+	go func() {
+		if err := srv.ListenAndServe(); err != nil {
+			log.Println(err)
+		}
+	}()
+
+	c := make(chan os.Signal, 1)
+	// We'll accept graceful shutdowns when quit via SIGINT (Ctrl+C)
+	// SIGKILL, SIGQUIT or SIGTERM (Ctrl+/) will not be caught.
+	signal.Notify(c, os.Interrupt)
+
+	// Block until we receive our signal.
+	<-c
+
+	// Create a deadline to wait for.
+	ctx, cancel := context.WithTimeout(context.Background(), appconf.Server.HttpServerGracefulShutdownTimeout)
+	defer cancel()
+	// Doesn't block if no connections, but will otherwise wait
+	// until the timeout deadline.
+	srv.Shutdown(ctx)
+	// Optionally, you could run srv.Shutdown in a goroutine and block on
+	// <-ctx.Done() if your application should wait for other services
+	// to finalize based on context cancellation.
+	log.Println("shutting down")
+	os.Exit(0)
 }

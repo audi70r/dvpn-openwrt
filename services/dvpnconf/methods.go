@@ -2,10 +2,12 @@ package dvpnconf
 
 import (
 	"encoding/json"
-	"github.com/solarlabsteam/dvpn-openwrt/services/node"
 	"io/ioutil"
 	"os"
 	"os/exec"
+
+	"github.com/solarlabsteam/dvpn-openwrt/services/node"
+	appconf "github.com/solarlabsteam/dvpn-openwrt/utilities/appconf"
 
 	"github.com/pelletier/go-toml"
 )
@@ -13,7 +15,7 @@ import (
 func GetConfigs() (config []byte, err error) {
 	var dVPNConfig dVPNConfig
 
-	configPath := os.Getenv("HOME") + dVPNConfigPath
+	configPath := appconf.Paths.DVPNConfigFullPath()
 	confBytes, readErr := ioutil.ReadFile(configPath)
 
 	// if config could not be read, attempt to init config
@@ -21,14 +23,14 @@ func GetConfigs() (config []byte, err error) {
 		return initConfig()
 	}
 
-	wireguardConfigPath := os.Getenv("HOME") + dVPNWireguardPath
-	_, readErr = ioutil.ReadFile(wireguardConfigPath)
+	wgConfigPath := appconf.Paths.WireGuardConfigFullPath()
+	_, readErr = ioutil.ReadFile(wgConfigPath)
 
 	if readErr != nil {
 		return initWireguardConfig()
 	}
 
-	tlsCertPath := os.Getenv("HOME") + dVPNCertificatePath
+	tlsCertPath := appconf.Paths.CertificateFullPath()
 	_, readErr = ioutil.ReadFile(tlsCertPath)
 
 	if readErr != nil {
@@ -45,7 +47,7 @@ func GetConfigs() (config []byte, err error) {
 }
 
 func PostConfig(config dVPNConfig) (resp []byte, err error) {
-	configPath := os.Getenv("HOME") + dVPNConfigPath
+	configPath := appconf.Paths.DVPNConfigFullPath()
 
 	configBytes, err := toml.Marshal(config)
 
