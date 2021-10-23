@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/solarlabsteam/dvpn-openwrt/controllers"
+	"github.com/solarlabsteam/dvpn-openwrt/services/keys"
 	"github.com/solarlabsteam/dvpn-openwrt/services/socket"
 	"github.com/solarlabsteam/dvpn-openwrt/utilities/appconf"
 	"io/fs"
@@ -22,6 +23,11 @@ var public embed.FS
 func main() {
 	// load config
 	appconf.LoadConf()
+
+	// load sentinel key storage
+	if err := keys.Load(appconf.Paths.SentinelDir); err != nil {
+		panic(err)
+	}
 
 	r := mux.NewRouter()
 

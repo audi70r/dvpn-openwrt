@@ -7,7 +7,7 @@ import (
 	"os/exec"
 
 	"github.com/solarlabsteam/dvpn-openwrt/services/node"
-	appconf "github.com/solarlabsteam/dvpn-openwrt/utilities/appconf"
+	"github.com/solarlabsteam/dvpn-openwrt/utilities/appconf"
 
 	"github.com/pelletier/go-toml"
 )

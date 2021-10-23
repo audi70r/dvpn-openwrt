@@ -12,7 +12,7 @@ func ListKeys(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
 
-	keys, err := keys.List()
+	keys, err := keys.Wallet.List()
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -38,7 +38,7 @@ func AddRecoverKeys(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
-	err = keys.AddRecover(addKeys)
+	err = keys.Wallet.AddRecover(addKeys)
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

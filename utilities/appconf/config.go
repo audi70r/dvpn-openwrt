@@ -49,6 +49,15 @@ func LoadConf() {
 	}
 }
 
+func LoadTestConf() {
+	LoadConf()
+	Paths.HomeDir = "./../../temp"
+}
+
+func (p *PathsConf) SentinelPath() string {
+	return fmt.Sprintf("%v%v", p.HomeDir, p.SentinelDir)
+}
+
 func (p *PathsConf) DVPNConfigFullPath() string {
 	return fmt.Sprintf("%v%v%v", p.HomeDir, p.SentinelDir, p.DVPNConfigPath)
 }

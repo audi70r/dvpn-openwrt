@@ -1,89 +1,72 @@
 package keys
 
 import (
-	"bytes"
-	"errors"
-	"fmt"
-	"github.com/solarlabsteam/dvpn-openwrt/services/node"
-	"github.com/solarlabsteam/dvpn-openwrt/services/socket"
-	"os/exec"
-	"strings"
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/crypto/hd"
+	"github.com/cosmos/cosmos-sdk/crypto/keyring"
+	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func List() (keys Keys, err error) {
-	var out bytes.Buffer
-
-	keys.Keys = make([]Key, 0)
-
-	cmd := exec.Command(node.DVPNNodeExec, node.DVPNNodeKeys, node.DVPNNodeList)
-	cmd.Stdout = &out
-
-	err = cmd.Run()
-
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-
-	fmt.Println()
-
-	keysRings := strings.Split(out.String(), "\n")
-
-	if len(keysRings) < 2 {
-		return keys, err
-	}
-
-	for _, keyRing := range keysRings {
-		keyRingSlice := strings.Fields(keyRing)
-
-		if len(keyRingSlice) == 3 && len(keyRingSlice)%3 == 0 {
-			key := Key{
-				Name:     keyRingSlice[0],
-				Operator: keyRingSlice[1],
-				Address:  keyRingSlice[2],
-			}
-
-			keys.Keys = append(keys.Keys, key)
-		}
+func (s Store) List() (keys Keys, err error) {
+	for _, key := range s.Keys.Keys {
+		keys.Keys = append(keys.Keys, Key{
+			Name:     key.Name,
+			Operator: key.Operator,
+			Address:  key.Address,
+		})
 	}
 
 	return keys, err
 }
 
-func AddRecover(req AddRecoverRequest) (err error) {
-	//var out bytes.Buffer
-
-	// Run the dvpn-node keys command, setting the key name and recovering it from a mnemonic
-	cmd := exec.Command(node.DVPNNodeExec, node.DVPNNodeKeys, node.DVPNNodeAdd, req.Name, node.DVPNNodeRecover)
-	nodeStdErr, _ := cmd.StderrPipe()
-
-	mnemonicBuf := bytes.Buffer{}
-	mnemonicBuf.Write([]byte(req.Mnemonic + "\n\r"))
-	cmd.Stdin = &mnemonicBuf
-
-	if err = cmd.Start(); err != nil {
+func (s *Store) AddRecover(req AddRecoverRequest) (err error) {
+	if _, err = s.RecoverAddressFromMnemonic(req.Mnemonic, req.Name); err != nil {
 		return err
-	}
-
-	if err != nil {
-		fmt.Println(err.Error())
-		return err
-	}
-
-	// need to send out to a channel
-	stdOutErr := make(chan string)
-
-	go node.SendCaptureAndReturn(nodeStdErr, stdOutErr)
-
-	cmd.Wait()
-
-	stdErr := <-stdOutErr
-
-	close(stdOutErr)
-	socket.Conn.Send([]byte(stdErr))
-
-	if strings.Contains(stdErr, "Error") {
-		return errors.New(stdErr)
 	}
 
 	return nil
+}
+
+func newKeyringFromBackend(ctx client.Context, backend string) (keyring.Keyring, error) {
+	if ctx.GenerateOnly || ctx.Simulate {
+		return keyring.New(sdk.KeyringServiceName(), keyring.BackendFile, ctx.KeyringDir, ctx.Input)
+	}
+	return keyring.New(sdk.KeyringServiceName(), backend, ctx.KeyringDir, ctx.Input)
+}
+
+func (s *Store) addKeyring(mnemonic, name string) (keyring.Info, error) {
+	var info keyring.Info
+	var bip39Passphrase string
+	var coinType = uint32(cosmosTypes.CoinType)
+	var account = uint32(0)
+	var index = uint32(0)
+	var hdPath = hd.CreateHDPath(coinType, account, index).String()
+	var algoStr = string(hd.Secp256k1Type)
+
+	keyringAlgos, _ := s.context.Keyring.SupportedAlgorithms()
+	algo, err := keyring.NewSigningAlgoFromString(algoStr, keyringAlgos)
+	if err != nil {
+		return nil, err
+	}
+
+	info, err = s.context.Keyring.NewAccount(name, mnemonic, bip39Passphrase, hdPath, algo)
+	if err != nil {
+		return nil, err
+	}
+
+	return info, nil
+}
+
+func (s Store) RecoverAddressFromMnemonic(mnemonic, name string) (string, error) {
+	var stringAddr string
+
+	info, err := s.addKeyring(mnemonic, name)
+	if err != nil {
+		return stringAddr, err
+	}
+
+	stringAddr = info.GetAddress().String()
+
+	return stringAddr, nil
 }
