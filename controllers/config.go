@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"encoding/json"
 	"github.com/solarlabsteam/dvpn-openwrt/services/dvpnconf"
 	"io/ioutil"
 	"net/http"
@@ -9,13 +10,8 @@ import (
 func Config(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
-		config, err := dvpnconf.GetConfigs()
-
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.Write(config)
+		json.NewEncoder(w).Encode(dvpnconf.Config.DVPN)
 	case http.MethodPost:
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
@@ -28,7 +24,7 @@ func Config(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 		}
 
-		resp, err := dvpnconf.PostConfig(config)
+		resp, err := dvpnconf.Config.PostConfig(config)
 
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)

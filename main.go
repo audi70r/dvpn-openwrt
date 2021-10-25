@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/solarlabsteam/dvpn-openwrt/controllers"
+	"github.com/solarlabsteam/dvpn-openwrt/services/dvpnconf"
 	"github.com/solarlabsteam/dvpn-openwrt/services/keys"
 	"github.com/solarlabsteam/dvpn-openwrt/services/socket"
 	"github.com/solarlabsteam/dvpn-openwrt/utilities/appconf"
@@ -23,6 +24,11 @@ var public embed.FS
 func main() {
 	// load config
 	appconf.LoadConf()
+
+	// load configurations
+	if confErr := dvpnconf.LoadConfig(); confErr != nil {
+		panic(confErr)
+	}
 
 	// load sentinel key storage
 	if err := keys.Load(appconf.Paths.SentinelDir); err != nil {
@@ -46,9 +52,9 @@ func main() {
 	r.Path("/api/node").HandlerFunc(controllers.GetNode).Methods("GET")
 	r.Path("/api/node/kill").HandlerFunc(controllers.KillNode).Methods("POST")
 	r.Path("/api/config").HandlerFunc(controllers.Config).Methods("GET", "POST")
-	r.HandleFunc("/api/socket", socket.Handle)
 	r.Path("/api/keys").HandlerFunc(controllers.ListKeys).Methods("GET")
 	r.Path("/api/keys/add").HandlerFunc(controllers.AddRecoverKeys).Methods("POST")
+	r.HandleFunc("/api/socket", socket.Handle)
 	r.PathPrefix("/").Handler(publicFS) // serve embedded static assets
 
 	srv := &http.Server{
