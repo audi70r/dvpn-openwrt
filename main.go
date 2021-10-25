@@ -42,14 +42,14 @@ func main() {
 	publicDir, _ := fs.Sub(public, "public")
 	publicFS := http.FileServer(http.FS(publicDir))
 
-	r.PathPrefix("/").Handler(publicFS) // serve embedded static assets
 	r.HandleFunc("/api/node/start/stream", controllers.StartNodeStreamStd)
-	r.HandleFunc("/api/node", controllers.GetNode)
-	r.HandleFunc("/api/node/kill", controllers.KillNode)
-	r.HandleFunc("/api/config", controllers.Config)
+	r.Path("/api/node").HandlerFunc(controllers.GetNode).Methods("GET")
+	r.Path("/api/node/kill").HandlerFunc(controllers.KillNode).Methods("POST")
+	r.Path("/api/config").HandlerFunc(controllers.Config).Methods("GET", "POST")
 	r.HandleFunc("/api/socket", socket.Handle)
-	r.HandleFunc("/api/keys", controllers.ListKeys)
-	r.HandleFunc("/api/keys/add", controllers.AddRecoverKeys)
+	r.Path("/api/keys").HandlerFunc(controllers.ListKeys).Methods("GET")
+	r.Path("/api/keys/add").HandlerFunc(controllers.AddRecoverKeys).Methods("POST")
+	r.PathPrefix("/").Handler(publicFS) // serve embedded static assets
 
 	srv := &http.Server{
 		Addr:         fmt.Sprintf("%v:%v", appconf.Server.Addr, appconf.Server.Port),

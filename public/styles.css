@@ -34,6 +34,10 @@ body {
     justify-content: center;
 }
 
+#status-bar-uptime {
+    font-size: 100%;
+}
+
 .status-bar .status-bar-item {
     background: linear-gradient(to bottom, #143560 0%, #000f2f 100%);
     width: 305px;

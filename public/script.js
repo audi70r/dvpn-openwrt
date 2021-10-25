@@ -205,7 +205,7 @@ window.onload = function() {
                     startNodeBtn.style.display = "none"
                     // If node is online, start the online counter
                     startTime = new Date(resp.StartTime)
-                    document.getElementById("status-bar-uptime").innerHTML = formatDate(startTime)
+                    document.getElementById("status-bar-uptime").innerHTML = countdown(startTime).toString()
                 } else {
                     document.getElementById("status-bar-uptime").innerHTML = "---"
                     document.getElementById("node-status").innerHTML = "Inactive"
