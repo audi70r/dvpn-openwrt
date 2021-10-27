@@ -8,10 +8,6 @@ import (
 )
 
 func ListKeys(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-	}
-
 	keys, err := keys.Wallet.List()
 
 	if err != nil {

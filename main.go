@@ -54,6 +54,7 @@ func main() {
 	r.Path("/api/config").HandlerFunc(controllers.Config).Methods("GET", "POST")
 	r.Path("/api/keys").HandlerFunc(controllers.ListKeys).Methods("GET")
 	r.Path("/api/keys/add").HandlerFunc(controllers.AddRecoverKeys).Methods("POST")
+	r.Path("/api/nat").HandlerFunc(controllers.GetNATInfo).Methods("GET")
 	r.HandleFunc("/api/socket", socket.Handle)
 	r.PathPrefix("/").Handler(publicFS) // serve embedded static assets
 
