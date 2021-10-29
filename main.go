@@ -17,11 +17,14 @@ import (
 	"os/signal"
 )
 
-//go:embed public
+const version = "1.0.0"
 
+//go:embed public
 var public embed.FS
 
 func main() {
+	fmt.Printf("Starting DVPN Interface!\n Version: %s", version)
+
 	// load config
 	appconf.LoadConf()
 
