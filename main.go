@@ -23,7 +23,14 @@ const version = "1.0.0"
 var public embed.FS
 
 func main() {
-	fmt.Printf("Starting DVPN Interface!\n Version: %s", version)
+
+	if len(os.Args) > 1 {
+		switch os.Args[1] {
+		case "version":
+			fmt.Printf("DVPN Interface version: %s\n", version)
+			os.Exit(0)
+		}
+	}
 
 	// load config
 	appconf.LoadConf()
