@@ -16,7 +16,7 @@ import (
 const (
 	BackEndTypeTest               = "test"
 	DefaultRPCAddress             = "https://rpc.sentinel.co:443"
-	DefaultGasPrices              = "0.1udvpn"
+	DefaultGasPrices              = "10udvpn"
 	DefaultChainID                = "sentinelhub-2"
 	DefaultGas                    = 200000
 	DefaultGasAdjustment          = 1.05
@@ -25,7 +25,7 @@ const (
 	DefaultIntervalUpdateSessions = "1h55m0s"
 	DefaultIntervalUpdateStatus   = "55m0s"
 	DefaultMoniker                = "My dVPN Node"
-	DefaultPrice                  = "0.1tsent"
+	DefaultPrice                  = "100udvpn"
 	DefaultListenOnAddr           = "0.0.0.0"
 )
 
