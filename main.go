@@ -31,7 +31,7 @@ func main() {
 	}
 
 	// load sentinel key storage
-	if err := keys.Load(appconf.Paths.SentinelDir); err != nil {
+	if err := keys.Load(appconf.Paths.SentinelPath()); err != nil {
 		panic(err)
 	}
 

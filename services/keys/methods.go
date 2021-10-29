@@ -6,14 +6,25 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	cosmosTypes "github.com/cosmos/cosmos-sdk/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/solarlabsteam/dvpn-openwrt/utilities/appconf"
 )
 
-func (s Store) List() (keys Keys, err error) {
-	for _, key := range s.Keys.Keys {
+func (s *Store) List() (keys Keys, err error) {
+	kr, err := newKeyringFromBackend(*s.context, keyring.BackendTest)
+	if err != nil {
+		return keys, err
+	}
+
+	krInfo, err := kr.List()
+	if err != nil {
+		return keys, err
+	}
+
+	for _, key := range krInfo {
 		keys.Keys = append(keys.Keys, Key{
-			Name:     key.Name,
-			Operator: key.Operator,
-			Address:  key.Address,
+			Name:     key.GetName(),
+			Operator: key.GetType().String(),
+			Address:  key.GetAddress().String(),
 		})
 	}
 
@@ -29,10 +40,7 @@ func (s *Store) AddRecover(req AddRecoverRequest) (err error) {
 }
 
 func newKeyringFromBackend(ctx client.Context, backend string) (keyring.Keyring, error) {
-	if ctx.GenerateOnly || ctx.Simulate {
-		return keyring.New(sdk.KeyringServiceName(), keyring.BackendFile, ctx.KeyringDir, ctx.Input)
-	}
-	return keyring.New(sdk.KeyringServiceName(), backend, ctx.KeyringDir, ctx.Input)
+	return keyring.New(sdk.KeyringServiceName(), backend, appconf.Paths.SentinelDir, ctx.Input)
 }
 
 func (s *Store) addKeyring(mnemonic, name string) (keyring.Info, error) {

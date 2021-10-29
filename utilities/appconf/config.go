@@ -40,7 +40,7 @@ func LoadConf() {
 
 	Paths = PathsConf{
 		BinDir:             "/usr/sbin:/usr/bin:/sbin:/bin:",
-		HomeDir:            "/root",
+		HomeDir:            "",
 		SentinelDir:        "/.sentinelnode",
 		DVPNConfigPath:     "/config.toml",
 		WgPath:             "/wireguard.toml",

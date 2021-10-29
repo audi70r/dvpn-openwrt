@@ -2,14 +2,16 @@ package node
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/solarlabsteam/dvpn-openwrt/services/socket"
+	"github.com/solarlabsteam/dvpn-openwrt/utilities/appconf"
 	"io"
 	"os/exec"
 	"time"
 )
 
 func StartNodeStd() (resp []byte, err error) {
-	cmd := exec.Command(DVPNNodeExec, DVPNNodeStart)
+	cmd := exec.Command(DVPNNodeExec, DVPNNodeStart, fmt.Sprintf("%s=%s", DVPNNodeHomeDirParam, appconf.Paths.SentinelPath()))
 	NodeStdOut, _ = cmd.StdoutPipe()
 	NodeStdErr, _ = cmd.StderrPipe()
 
@@ -88,32 +90,6 @@ func SendAndCapture(r io.Reader) {
 			break
 		}
 	}
-
-	return
-}
-
-func SendCaptureAndReturn(r io.Reader, stdOutErr chan string) {
-	var out []byte
-	buf := make([]byte, 1024, 1024)
-	for {
-		n, err := r.Read(buf[:])
-		if n > 0 {
-			d := buf[:n]
-			out = append(out, d...)
-			if err != nil {
-				break
-			}
-		}
-		if err != nil {
-			// Read returns io.EOF at the end of file, which is not an error for us
-			if err == io.EOF {
-				err = nil
-			}
-			break
-		}
-	}
-
-	stdOutErr <- string(out)
 
 	return
 }

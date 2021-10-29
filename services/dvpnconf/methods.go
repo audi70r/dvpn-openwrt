@@ -2,9 +2,11 @@ package dvpnconf
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path/filepath"
 
 	"github.com/solarlabsteam/dvpn-openwrt/services/node"
 	"github.com/solarlabsteam/dvpn-openwrt/utilities/appconf"
@@ -37,8 +39,11 @@ var Config Configurations
 
 func LoadConfig() error {
 	Config.ConfPath = appconf.Paths.DVPNConfigFullPath()
-	confBytes, readErr := ioutil.ReadFile(Config.ConfPath)
+	fmt.Println(appconf.Paths.DVPNConfigFullPath())
+	confBytes, readErr := os.ReadFile(Config.ConfPath)
 
+	absPath, _ := filepath.Abs(Config.ConfPath)
+	fmt.Println(absPath)
 	// if config does not exist, create an empty config
 	if readErr != nil {
 		if err := os.MkdirAll(appconf.Paths.SentinelPath(), os.ModePerm); err != nil {
