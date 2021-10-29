@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+const DVPNNodeHomeDirParam = "--home"
+
 type ServerConf struct {
 	Addr                              string
 	Port                              string

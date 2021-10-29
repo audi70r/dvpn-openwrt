@@ -51,9 +51,10 @@ func main() {
 	r.HandleFunc("/api/node/start/stream", controllers.StartNodeStreamStd)
 	r.Path("/api/node").HandlerFunc(controllers.GetNode).Methods("GET")
 	r.Path("/api/node/kill").HandlerFunc(controllers.KillNode).Methods("POST")
-	r.Path("/api/config").HandlerFunc(controllers.Config).Methods("GET", "POST")
+	r.Path("/api/config").HandlerFunc(controllers.GetConfig).Methods("GET")
+	r.Path("/api/config").HandlerFunc(controllers.PostConfig).Methods("POST")
 	r.Path("/api/keys").HandlerFunc(controllers.ListKeys).Methods("GET")
-	r.Path("/api/keys/add").HandlerFunc(controllers.AddRecoverKeys).Methods("POST")
+	r.Path("/api/keys").HandlerFunc(controllers.AddRecoverKeys).Methods("POST")
 	r.Path("/api/nat").HandlerFunc(controllers.GetNATInfo).Methods("GET")
 	r.HandleFunc("/api/socket", socket.Handle)
 	r.PathPrefix("/").Handler(publicFS) // serve embedded static assets

@@ -11,7 +11,7 @@ import (
 )
 
 func StartNodeStd() (resp []byte, err error) {
-	cmd := exec.Command(DVPNNodeExec, DVPNNodeStart, fmt.Sprintf("%s=%s", DVPNNodeHomeDirParam, appconf.Paths.SentinelPath()))
+	cmd := exec.Command(DVPNNodeExec, DVPNNodeStart, fmt.Sprintf("%s=%s", appconf.DVPNNodeHomeDirParam, appconf.Paths.SentinelPath()))
 	NodeStdOut, _ = cmd.StdoutPipe()
 	NodeStdErr, _ = cmd.StderrPipe()
 

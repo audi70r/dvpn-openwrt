@@ -185,10 +185,12 @@ window.onload = function() {
             "Mnemonic": document.getElementById("conf-keys-mnemonic").value
         }
 
-        const url= api + 'keys/add';
+        const url= api + 'keys';
         Http.open("POST", url);
         Http.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         Http.send(JSON.stringify(keys));
+        document.getElementById("conf-keys-name").value = ""
+        document.getElementById("conf-keys-mnemonic").value = ""
     }
 
 // Node

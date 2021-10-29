@@ -3,13 +3,12 @@ package dvpnconf
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/audi70r/gochecknat"
+	"github.com/solarlabsteam/dvpn-openwrt/services/node"
+	"github.com/solarlabsteam/dvpn-openwrt/utilities/appconf"
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"path/filepath"
-
-	"github.com/solarlabsteam/dvpn-openwrt/services/node"
-	"github.com/solarlabsteam/dvpn-openwrt/utilities/appconf"
 
 	"github.com/pelletier/go-toml"
 )
@@ -27,6 +26,7 @@ const (
 	DefaultIntervalUpdateStatus   = "55m0s"
 	DefaultMoniker                = "My dVNP Node"
 	DefaultPrice                  = "0.1tsent"
+	DefaultListenOnAddr           = "0.0.0.0"
 )
 
 type Configurations struct {
@@ -42,11 +42,24 @@ func LoadConfig() error {
 	fmt.Println(appconf.Paths.DVPNConfigFullPath())
 	confBytes, readErr := os.ReadFile(Config.ConfPath)
 
-	absPath, _ := filepath.Abs(Config.ConfPath)
-	fmt.Println(absPath)
+	// init wireguard.toml config, and initiate it if it's not found
+	wgConfigPath := appconf.Paths.WireGuardConfigFullPath()
+	_, readErr = ioutil.ReadFile(wgConfigPath)
+
+	if readErr != nil {
+		if wireguardErr := initWireguardConfig(); wireguardErr != nil {
+			return wireguardErr
+		}
+	}
+
 	// if config does not exist, create an empty config
 	if readErr != nil {
 		if err := os.MkdirAll(appconf.Paths.SentinelPath(), os.ModePerm); err != nil {
+			return err
+		}
+
+		natInfo, err := gochecknat.GetNATInfo()
+		if err != nil {
 			return err
 		}
 
@@ -64,8 +77,10 @@ func LoadConfig() error {
 		Config.DVPN.Node.IntervalUpdateStatus = DefaultIntervalUpdateStatus
 		Config.DVPN.Node.Moniker = DefaultMoniker
 		Config.DVPN.Node.Price = DefaultPrice
+		Config.DVPN.Node.ListenOn = fmt.Sprintf("%s:%v", DefaultListenOnAddr, natInfo.Port)
+		Config.DVPN.Node.RemoteURL = fmt.Sprintf("https://%s:%v", natInfo.IP, natInfo.Port)
 
-		_, err := Config.PostConfig(Config.DVPN)
+		_, err = Config.PostConfig(Config.DVPN)
 
 		return err
 	}
@@ -78,15 +93,8 @@ func LoadConfig() error {
 }
 
 func GetConfigs() (config []byte, err error) {
-	wgConfigPath := appconf.Paths.WireGuardConfigFullPath()
-	_, readErr := ioutil.ReadFile(wgConfigPath)
-
-	if readErr != nil {
-		return initWireguardConfig()
-	}
-
 	tlsCertPath := appconf.Paths.CertificateFullPath()
-	_, readErr = ioutil.ReadFile(tlsCertPath)
+	_, readErr := ioutil.ReadFile(tlsCertPath)
 
 	if readErr != nil {
 		return generateCertificate()
@@ -118,16 +126,16 @@ func (c *Configurations) PostConfig(config dVPNConfig) (resp []byte, err error) 
 	return resp, err
 }
 
-func initWireguardConfig() (config []byte, err error) {
-	cmd := exec.Command(node.DVPNNodeExec, node.DVPNNodeWireguard, node.DVPNNodeConfig, node.DVPNNodeInit)
+func initWireguardConfig() (err error) {
+	cmd := exec.Command(node.DVPNNodeExec, node.DVPNNodeWireguard, node.DVPNNodeConfig, node.DVPNNodeInit, appconf.DVPNNodeHomeDirParam, appconf.Paths.SentinelPath())
 
 	err = cmd.Run()
 
 	if err != nil {
-		return config, err
+		return err
 	}
 
-	return GetConfigs()
+	return nil
 }
 
 func generateCertificate() (config []byte, err error) {
