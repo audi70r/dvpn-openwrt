@@ -241,7 +241,7 @@ window.onload = function() {
             checkNodeStatus();
         }
 
-        const url= api + '/node/kill';
+        const url= api + 'node/kill';
         Http.open("POST", url);
         Http.send();
     }
