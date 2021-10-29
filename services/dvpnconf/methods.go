@@ -24,7 +24,7 @@ const (
 	DefaultIntervalSetSessions    = "2m0s"
 	DefaultIntervalUpdateSessions = "1h55m0s"
 	DefaultIntervalUpdateStatus   = "55m0s"
-	DefaultMoniker                = "My dVNP Node"
+	DefaultMoniker                = "My dVPN Node"
 	DefaultPrice                  = "0.1tsent"
 	DefaultListenOnAddr           = "0.0.0.0"
 )
