@@ -35,8 +35,12 @@ func (e *Entry) IsPasswordValid() bool {
 func (e *Entry) VerifyPassword(pass string) (err error) {
 	// Do not permit null and locked passwords.
 	if e.Pass == "" {
+		if pass == "" {
+			return nil
+		}
 		return errors.New("verify: null password")
 	}
+
 	if e.Pass[0] == '!' {
 		return errors.New("verify: locked password")
 	}

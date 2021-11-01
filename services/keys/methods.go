@@ -40,7 +40,7 @@ func (s *Store) AddRecover(req AddRecoverRequest) (err error) {
 }
 
 func newKeyringFromBackend(ctx client.Context, backend string) (keyring.Keyring, error) {
-	return keyring.New(sdk.KeyringServiceName(), backend, appconf.Paths.SentinelDir, ctx.Input)
+	return keyring.New(sdk.KeyringServiceName(), backend, appconf.Paths.SentinelPath(), ctx.Input)
 }
 
 func (s *Store) addKeyring(mnemonic, name string) (keyring.Info, error) {

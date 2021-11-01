@@ -2,6 +2,9 @@ package appconf
 
 import (
 	"fmt"
+	"log"
+	"os"
+	"path"
 	"time"
 )
 
@@ -24,6 +27,7 @@ type PathsConf struct {
 	WgPath             string
 	CertificatePath    string
 	SHGenerateCertPath string
+	ShadowPath         string
 }
 
 var Server ServerConf
@@ -48,12 +52,23 @@ func LoadConf() {
 		WgPath:             "/wireguard.toml",
 		CertificatePath:    "/tls.crt",
 		SHGenerateCertPath: "/generatecert.sh",
+		ShadowPath:         "/etc/shadow",
 	}
 }
 
 func LoadTestConf() {
 	LoadConf()
-	Paths.HomeDir = "./../../temp"
+
+	wd, err := os.Getwd()
+	if err != nil {
+		log.Println(err)
+	}
+
+	Paths.HomeDir = path.Clean(fmt.Sprintf("%s/../../temp", wd))
+	Paths.ShadowPath = path.Clean(fmt.Sprintf("%s/../../temp/shadow", wd))
+
+	fmt.Println(Paths.HomeDir)
+	fmt.Println(Paths.ShadowPath)
 }
 
 func (p *PathsConf) SentinelPath() string {

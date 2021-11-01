@@ -8,12 +8,13 @@ import (
 
 func TestStore_RecoverAddressFromMnemonic(t *testing.T) {
 	appconf.LoadTestConf()
-	os.RemoveAll(appconf.Paths.SentinelPath())
 
-	s, err := New(appconf.Paths.SentinelPath())
-	if err != nil {
+	// load sentinel key storage
+	if err := Load(appconf.Paths.SentinelPath()); err != nil {
 		panic(err)
 	}
+
+	defer os.RemoveAll(appconf.Paths.SentinelPath())
 
 	type fields struct {
 		homeDir string
@@ -42,7 +43,8 @@ func TestStore_RecoverAddressFromMnemonic(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := s.RecoverAddressFromMnemonic(tt.args.mnemonic, tt.args.name)
+			got, err := Wallet.RecoverAddressFromMnemonic(tt.args.mnemonic, tt.args.name)
+
 			if (err != nil) != tt.wantErr {
 				t.Errorf("RecoverAddressFromMnemonic() error = %v, wantErr %v", err, tt.wantErr)
 				return

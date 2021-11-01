@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/solarlabsteam/dvpn-openwrt/controllers"
+	"github.com/solarlabsteam/dvpn-openwrt/services/auth"
 	"github.com/solarlabsteam/dvpn-openwrt/services/dvpnconf"
 	"github.com/solarlabsteam/dvpn-openwrt/services/keys"
 	"github.com/solarlabsteam/dvpn-openwrt/services/socket"
 	"github.com/solarlabsteam/dvpn-openwrt/utilities/appconf"
-	"io/fs"
 	"log"
 	"net/http"
 	"os"
@@ -52,21 +52,24 @@ func main() {
 		os.Setenv("HOME", appconf.Paths.HomeDir)
 	}
 	// for development: serve static assets from public folder
-	//publicFS := http.FileServer(http.Dir("./public"))
-
+	publicFS := http.FileServer(http.Dir("./public"))
 	// for production: embed static assets into binary
-	publicDir, _ := fs.Sub(public, "public")
-	publicFS := http.FileServer(http.FS(publicDir))
+	//publicDir, _ := fs.Sub(public, "public")
+	//publicFS := http.FileServer(http.FS(publicDir))
 
-	r.HandleFunc("/api/node/start/stream", controllers.StartNodeStreamStd)
-	r.Path("/api/node").HandlerFunc(controllers.GetNode).Methods("GET")
-	r.Path("/api/node/kill").HandlerFunc(controllers.KillNode).Methods("POST")
-	r.Path("/api/config").HandlerFunc(controllers.GetConfig).Methods("GET")
-	r.Path("/api/config").HandlerFunc(controllers.PostConfig).Methods("POST")
-	r.Path("/api/keys").HandlerFunc(controllers.ListKeys).Methods("GET")
-	r.Path("/api/keys").HandlerFunc(controllers.AddRecoverKeys).Methods("POST")
-	r.Path("/api/nat").HandlerFunc(controllers.GetNATInfo).Methods("GET")
+	api := r.PathPrefix("/api").Subrouter()
+	api.Use(auth.Store.Authenticate)
+	api.Path("/node/start/stream").HandlerFunc(controllers.StartNodeStreamStd).Methods("GET")
+	api.Path("/node").HandlerFunc(controllers.GetNode).Methods("GET")
+	api.Path("/node/kill").HandlerFunc(controllers.KillNode).Methods("POST")
+	api.Path("/config").HandlerFunc(controllers.GetConfig).Methods("GET")
+	api.Path("/config").HandlerFunc(controllers.PostConfig).Methods("POST")
+	api.Path("/keys").HandlerFunc(controllers.ListKeys).Methods("GET")
+	api.Path("/keys").HandlerFunc(controllers.AddRecoverKeys).Methods("POST")
+	api.Path("/nat").HandlerFunc(controllers.GetNATInfo).Methods("GET")
+
 	r.HandleFunc("/api/socket", socket.Handle)
+	r.Path("/api/login").HandlerFunc(controllers.Login).Methods("POST")
 	r.PathPrefix("/").Handler(publicFS) // serve embedded static assets
 
 	srv := &http.Server{

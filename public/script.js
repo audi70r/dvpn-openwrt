@@ -84,11 +84,14 @@ window.onload = function() {
                 document.getElementById("config-section-handshake").innerHTML = (resp.Handshake.Enable == true ? "ENABLED" : "DISABLED")
 
                 listenOnPort = resp.Node.ListenOn.split(":")[1]
+            } else if (this.readyState == 4 && this.status == 401) {
+                window.location = "/login.html"
             }
         };
 
         const url=api + 'config';
         Http.open("GET", url);
+        Http.setRequestHeader("Authorization", localStorage.getItem("authToken"))
         Http.send();
     }
 
@@ -114,11 +117,14 @@ window.onload = function() {
                             </div>
                         </div>`
                 })
+            } else if (this.readyState == 4 && this.status == 401) {
+                window.location = "/login.html"
             }
         }
 
         const url=api + 'keys';
         Http.open("GET", url);
+        Http.setRequestHeader("Authorization", localStorage.getItem("authToken"))
         Http.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         Http.send();
     }
@@ -130,6 +136,8 @@ window.onload = function() {
             if (this.readyState == 4 && this.status == 200) {
                 getConfig();
                 modal.style.display = "none";
+            } else if (this.readyState == 4 && this.status == 401) {
+                window.location = "/login.html"
             }
         }
 
@@ -165,6 +173,7 @@ window.onload = function() {
 
         const url= api + 'config';
         Http.open("POST", url);
+        Http.setRequestHeader("Authorization", localStorage.getItem("authToken"))
         Http.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         Http.send(JSON.stringify(config));
     }
@@ -176,6 +185,8 @@ window.onload = function() {
             if (this.readyState == 4 && this.status == 200) {
                 getConfig();
                 getKeyring();
+            } else if (this.readyState == 4 && this.status == 401) {
+                window.location = "/login.html"
             }
             modalKeyring.style.display = "none";
         }
@@ -187,6 +198,7 @@ window.onload = function() {
 
         const url= api + 'keys';
         Http.open("POST", url);
+        Http.setRequestHeader("Authorization", localStorage.getItem("authToken"))
         Http.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         Http.send(JSON.stringify(keys));
         document.getElementById("conf-keys-name").value = ""
@@ -214,11 +226,14 @@ window.onload = function() {
                     stopNodeBtn.style.display = "none"
                     startNodeBtn.style.display = "block"
                 }
+            } else if (this.readyState == 4 && this.status == 401) {
+                window.location = "/login.html"
             }
         };
 
         const url = api + 'node';
         Http.open("GET", url);
+        Http.setRequestHeader("Authorization", localStorage.getItem("authToken"))
         Http.send();
     }
 
@@ -226,11 +241,15 @@ window.onload = function() {
         const Http = new XMLHttpRequest();
 
         Http.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 401) {
+                window.location = "/login.html"
+            }
             checkNodeStatus();
         }
 
         const url = api + 'node/start/stream';
         Http.open("GET", url);
+        Http.setRequestHeader("Authorization", localStorage.getItem("authToken"))
         Http.send();
     };
 
@@ -238,11 +257,15 @@ window.onload = function() {
         const Http = new XMLHttpRequest();
 
         Http.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 401) {
+                window.location = "/login.html"
+            }
             checkNodeStatus();
         }
 
         const url= api + 'node/kill';
         Http.open("POST", url);
+        Http.setRequestHeader("Authorization", localStorage.getItem("authToken"))
         Http.send();
     }
 
@@ -298,25 +321,3 @@ window.onload = function() {
             modalKeyring.style.display = "none";
         }
     }
-
-function formatDate(startTime) {
-    currentDate = new Date()
-    diffTimestamp = currentDate.getTime() - startTime.getTime()
-    diffDate = new Date(diffTimestamp);
-
-    if (startTime.getFullYear() == 1) {
-        return "---"
-    }
-
-    years = currentDate.getFullYear() - startTime.getFullYear()
-    months = currentDate.getMonth() - startTime.getMonth()
-    days = currentDate.getDay() - startTime.getDay()
-    hours = currentDate.getHours() - startTime.getHours()
-    minutes = currentDate.getMinutes() - startTime.getMinutes()
-    seconds = currentDate.getSeconds() - startTime.getSeconds()
-
-
-    prettyPrint = years + "y " + months + "m " + days + "d " + hours + "h " + minutes + "m " + seconds + "s"
-
-    return prettyPrint
-}

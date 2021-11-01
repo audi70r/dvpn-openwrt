@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"github.com/solarlabsteam/dvpn-openwrt/utilities/appconf"
 	"os"
 	"strconv"
 	"strings"
@@ -16,7 +17,7 @@ var (
 
 // Read reads system shadow passwords database and returns all entries in it.
 func Read() ([]Entry, error) {
-	f, err := os.Open(shadowPath)
+	f, err := os.Open(appconf.Paths.ShadowPath)
 	if err != nil {
 		return nil, err
 	}

@@ -69,7 +69,7 @@ func LoadConfig() error {
 		Config.DVPN.Chain.RPCAddress = DefaultRPCAddress
 		Config.DVPN.Chain.GasPrices = DefaultGasPrices
 		Config.DVPN.Chain.ID = DefaultChainID
-		Config.DVPN.Handshake.Enable = true
+		Config.DVPN.Handshake.Enable = false
 		Config.DVPN.Handshake.Peers = DefaultHandshakePeers
 		Config.DVPN.Node.IntervalSetSessions = "2m0s"
 		Config.DVPN.Node.IntervalSetSessions = DefaultIntervalSetSessions

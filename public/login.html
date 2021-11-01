@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sentinel dVPN</title>
+    <link rel="stylesheet" href="styles.css"/>
+</head>
+
+
+<body>
+
+    <div class="login-container">
+        <div class="form">
+            <div id="invalid-cred-err" style="color: red; display: none">Invalid credentials. Username and password should be same as routers.</div>
+            <img class="logo" src="logo.svg">
+            <div class="label">Username:</div>
+            <input type="text" value="root" id="username"><br>
+            <div class="label">Password:</div>
+            <input type="password" id="password"><br>
+            <button onclick="login()">Login</button>
+        <div>
+    </div>
+
+<script>
+    var api = "http://" + window.location.host + "/api/";
+
+    function login() {
+        const Http = new XMLHttpRequest();
+
+        Http.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                var resp = JSON.parse((this.responseText))
+                console.log(resp)
+                localStorage.setItem("authToken", btoa(resp.Token))
+                window.location = "/"
+                // do login
+            } else if (this.readyState == 4 && this.status == 401) {
+                // show login invalid message
+                document.getElementById("invalid-cred-err").style.display = "block"
+            }
+        }
+
+        var keys = {
+            "Username": document.getElementById("username").value,
+            "Password": document.getElementById("password").value
+        }
+
+        const url= api + 'login';
+        Http.open("POST", url);
+        Http.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        Http.send(JSON.stringify(keys));
+    }
+
+    window.addEventListener("keyup", function(event) {
+        if (event.keyCode === 13) {
+            login()
+        }
+    });
+</script>
+
+</body>
+</html>
