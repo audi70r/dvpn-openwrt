@@ -69,6 +69,7 @@ func main() {
 	api.Path("/config").HandlerFunc(controllers.PostConfig).Methods("POST")
 	api.Path("/keys").HandlerFunc(controllers.ListKeys).Methods("GET")
 	api.Path("/keys").HandlerFunc(controllers.AddRecoverKeys).Methods("POST")
+	api.Path("/delete").HandlerFunc(controllers.DeleteKeys).Methods("DELETE")
 	api.Path("/nat").HandlerFunc(controllers.GetNATInfo).Methods("GET")
 
 	r.HandleFunc("/api/socket", socket.Handle)

@@ -19,22 +19,37 @@ func ListKeys(w http.ResponseWriter, r *http.Request) {
 }
 
 func AddRecoverKeys(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-	}
-
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	addKeys, err := keys.ValidateAndUnmarshal(body)
+	addKeys, err := keys.ValidateAndUnmarshalRecovery(body)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
 	err = keys.Wallet.AddRecover(addKeys)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+}
+
+func DeleteKeys(w http.ResponseWriter, r *http.Request) {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	deleteKeys, err := keys.ValidateAndUnmarshalDeletion(body)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+
+	err = keys.Wallet.Delete(deleteKeys)
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

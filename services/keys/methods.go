@@ -39,6 +39,18 @@ func (s *Store) AddRecover(req AddRecoverRequest) (err error) {
 	return nil
 }
 
+func (s *Store) Delete(req DeleteRequest) (err error) {
+	for _, key := range req.KeyNames {
+		err = s.RemoveKeyFromKeyring(key)
+
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func newKeyringFromBackend(ctx client.Context, backend string) (keyring.Keyring, error) {
 	return keyring.New(sdk.KeyringServiceName(), backend, appconf.Paths.SentinelPath(), ctx.Input)
 }
@@ -77,4 +89,22 @@ func (s Store) RecoverAddressFromMnemonic(mnemonic, name string) (string, error)
 	stringAddr = info.GetAddress().String()
 
 	return stringAddr, nil
+}
+
+func (s Store) RemoveKeyFromKeyring(keyName string) error {
+	keys, err := s.context.Keyring.List()
+
+	if err != nil {
+		return err
+	}
+
+	for _, key := range keys {
+		if key.GetName() == keyName {
+			if err = s.context.Keyring.DeleteByAddress(key.GetAddress()); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
 }

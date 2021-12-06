@@ -195,12 +195,26 @@ body {
     margin-top: 20px;
 }
 
+.keyring-delete-btn {
+    margin-top: 30px;
+    width: 100%;
+    text-align: right;
+}
+
+.keyring-delete-btn div {
+    cursor: pointer;
+}
+
 .keyring-block .keyring {
     display: inline-grid;
 }
 
 .keyring-block div {
     display: inline;
+}
+
+.keyring-block input {
+    margin-right: 25px;
 }
 
 /* The Modal (background) */
@@ -226,6 +240,8 @@ body {
     max-width: 600px;
     width: 90%; /* Could be more or less, depending on screen size */
 }
+
+.
 
 .config-input-fields {
     display:flex;

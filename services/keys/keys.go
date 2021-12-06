@@ -25,6 +25,10 @@ type AddRecoverRequest struct {
 	Mnemonic string `json:"Mnemonic"`
 }
 
+type DeleteRequest struct {
+	KeyNames []string `json:"Names"`
+}
+
 type Store struct {
 	Keys    Keys
 	context *client.Context

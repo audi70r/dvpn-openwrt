@@ -105,6 +105,7 @@ window.onload = function() {
                     console.log(keyring)
                     document.getElementById("keyrings").innerHTML = document.getElementById("keyrings").innerHTML +
                         `<div class="keyring-block">
+                            <input type="checkbox">
                             <div class="keyring">
                                 <div class="keyring-name" style="font-weight: bold;">Name:</div>
                                 <div class="keyring-operator" style="font-weight: bold;">Address:</div>
@@ -124,6 +125,25 @@ window.onload = function() {
 
         const url=api + 'keys';
         Http.open("GET", url);
+        Http.setRequestHeader("Authorization", localStorage.getItem("authToken"))
+        Http.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        Http.send();
+    }
+
+    function deleteKeyringItems() {
+        console.log("delete selected keys")
+        const Http = new XMLHttpRequest();
+
+        Http.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                console.log("done")
+            } else if (this.readyState == 4 && this.status == 401) {
+                window.location = "/login.html"
+            }
+        }
+
+        const url=api + 'keys';
+        Http.open("DELETE", url);
         Http.setRequestHeader("Authorization", localStorage.getItem("authToken"))
         Http.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         Http.send();
