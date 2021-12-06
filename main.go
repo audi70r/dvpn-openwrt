@@ -9,6 +9,7 @@ import (
 	"github.com/solarlabsteam/dvpn-openwrt/services/auth"
 	"github.com/solarlabsteam/dvpn-openwrt/services/dvpnconf"
 	"github.com/solarlabsteam/dvpn-openwrt/services/keys"
+	"github.com/solarlabsteam/dvpn-openwrt/services/node"
 	"github.com/solarlabsteam/dvpn-openwrt/services/socket"
 	"github.com/solarlabsteam/dvpn-openwrt/utilities/appconf"
 	"io/fs"
@@ -46,6 +47,9 @@ func main() {
 		panic(err)
 	}
 
+	// load node
+	node := node.New()
+
 	r := mux.NewRouter()
 
 	if _, homeSet := os.LookupEnv("HOME"); !homeSet {
@@ -60,11 +64,12 @@ func main() {
 	publicDir, _ := fs.Sub(public, "public")
 	publicFS := http.FileServer(http.FS(publicDir))
 
+	// api group, that requires authorization
 	api := r.PathPrefix("/api").Subrouter()
 	api.Use(auth.Store.Authenticate)
-	api.Path("/node/start/stream").HandlerFunc(controllers.StartNodeStreamStd).Methods("GET")
-	api.Path("/node").HandlerFunc(controllers.GetNode).Methods("GET")
-	api.Path("/node/kill").HandlerFunc(controllers.KillNode).Methods("POST")
+	api.Path("/node/start/stream").HandlerFunc(node.StartNode).Methods("GET")
+	api.Path("/node").HandlerFunc(node.GetNode).Methods("GET")
+	api.Path("/node/kill").HandlerFunc(node.KillNode).Methods("POST")
 	api.Path("/config").HandlerFunc(controllers.GetConfig).Methods("GET")
 	api.Path("/config").HandlerFunc(controllers.PostConfig).Methods("POST")
 	api.Path("/keys").HandlerFunc(controllers.ListKeys).Methods("GET")
@@ -72,9 +77,12 @@ func main() {
 	api.Path("/delete").HandlerFunc(controllers.DeleteKeys).Methods("DELETE")
 	api.Path("/nat").HandlerFunc(controllers.GetNATInfo).Methods("GET")
 
+	// api group, that does not require authorization
 	r.HandleFunc("/api/socket", socket.Handle)
 	r.Path("/api/login").HandlerFunc(controllers.Login).Methods("POST")
-	r.PathPrefix("/").Handler(publicFS) // serve embedded static assets
+
+	// serve embedded static assets
+	r.PathPrefix("/").Handler(publicFS)
 
 	srv := &http.Server{
 		Addr:         fmt.Sprintf("%v:%v", appconf.Server.Addr, appconf.Server.Port),

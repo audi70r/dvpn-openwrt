@@ -1,7 +1,6 @@
 package node
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/solarlabsteam/dvpn-openwrt/services/socket"
 	"github.com/solarlabsteam/dvpn-openwrt/utilities/appconf"
@@ -10,66 +9,58 @@ import (
 	"time"
 )
 
-func StartNodeStd() (resp []byte, err error) {
+// StartNodeStreamOutputToSocket will run the node as a child process and stream the std output to a socket connection provided as an argument
+func (n *Node) StartNodeStreamOutputToSocket() (err error) {
 	cmd := exec.Command(DVPNNodeExec, DVPNNodeStart, fmt.Sprintf("%s=%s", appconf.DVPNNodeHomeDirParam, appconf.Paths.SentinelPath()))
-	NodeStdOut, _ = cmd.StdoutPipe()
-	NodeStdErr, _ = cmd.StderrPipe()
+	n.StdOut, _ = cmd.StdoutPipe()
+	n.StdErr, _ = cmd.StderrPipe()
 
 	if err = cmd.Start(); err != nil {
-		return []byte{}, err
+		return err
 	}
 
-	ND.Online = true
-	ND.StartTime = time.Now()
-	ND.OSProcess = cmd.Process
-	ND.Pid = cmd.Process.Pid
+	n.Online = true
+	n.StartTime = time.Now()
+	n.OSProcess = cmd.Process
+	n.Pid = cmd.Process.Pid
 
-	go SendAndCapture(NodeStdOut)
-	go SendAndCapture(NodeStdErr)
+	go stdOutToSocketBridge(n.StdOut, n.SocketConn)
+	go stdOutToSocketBridge(n.StdErr, n.SocketConn)
 
-	// After process ended, reset node to defaults
 	go func() {
 		cmd.Wait()
-		ND = Node{}
+		n.resetToDefaults()
 	}()
-
-	return []byte{}, err
-}
-
-func GetNode() (resp []byte, err error) {
-	if err = updateNodeStatus(DVPNNodeExec); err != nil {
-		return resp, err
-	}
-
-	resp, err = json.Marshal(ND)
-
-	if err != nil {
-		return resp, err
-	}
-
-	return resp, nil
-}
-
-func KillNode() (err error) {
-	if err = updateNodeStatus(DVPNNodeExec); err != nil {
-		return err
-	}
-
-	// node is already dead
-	if ND.OSProcess == nil {
-		return nil
-	}
-
-	if err = killProcessByPid(ND.Pid); err != nil {
-		return err
-	}
-
-	ND = Node{}
 
 	return nil
 }
 
-func SendAndCapture(r io.Reader) {
+// Kill will destroy the node child process.
+func (n *Node) Kill() (err error) {
+	// node is already dead
+	if n.OSProcess == nil {
+		return nil
+	}
+
+	if err = n.OSProcess.Kill(); err != nil {
+		return err
+	}
+
+	n.resetToDefaults()
+
+	return nil
+}
+
+// resetToDefaults will reset the node status values
+func (n *Node) resetToDefaults() {
+	n.Online = false
+	n.StartTime = time.Time{}
+	n.OSProcess = nil
+	n.Pid = 0
+}
+
+// stdOutToSocketBridge use the io and send its output to the provided websocket connection
+func stdOutToSocketBridge(r io.Reader, s *socket.Connection) {
 	var out []byte
 	buf := make([]byte, 1024, 1024)
 	for {
@@ -77,7 +68,7 @@ func SendAndCapture(r io.Reader) {
 		if n > 0 {
 			d := buf[:n]
 			out = append(out, d...)
-			socket.Conn.Send(d)
+			s.Send(d)
 			if err != nil {
 				break
 			}
