@@ -61,13 +61,11 @@ func (n *Node) resetToDefaults() {
 
 // stdOutToSocketBridge use the io and send its output to the provided websocket connection
 func stdOutToSocketBridge(r io.Reader, s *socket.Connection) {
-	var out []byte
 	buf := make([]byte, 1024, 1024)
 	for {
 		n, err := r.Read(buf[:])
 		if n > 0 {
 			d := buf[:n]
-			out = append(out, d...)
 			s.Send(d)
 			if err != nil {
 				break
