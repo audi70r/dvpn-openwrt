@@ -100,12 +100,12 @@ window.onload = function() {
 
         Http.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
-                var resp = JSON.parse((this.responseText))
-                resp.Keys.forEach(keyring => {
-                    console.log(keyring)
-                    document.getElementById("keyrings").innerHTML = document.getElementById("keyrings").innerHTML +
-                        `<div class="keyring-block">
-                            <input type="checkbox">
+                let resp = JSON.parse((this.responseText))
+                if (resp.Keys != null && resp.Keys.length > 0) {
+                    resp.Keys.forEach(keyring => {
+                        document.getElementById("keyrings").innerHTML = document.getElementById("keyrings").innerHTML +
+                            `<div class="keyring-block">
+                            <input type="checkbox" class="keyring-checkbox" id="${keyring.Name}">
                             <div class="keyring">
                                 <div class="keyring-name" style="font-weight: bold;">Name:</div>
                                 <div class="keyring-operator" style="font-weight: bold;">Address:</div>
@@ -117,11 +117,14 @@ window.onload = function() {
                                 <div class="keyring-address">${keyring.Address}</div>
                             </div>
                         </div>`
-                })
+                    })
+                }
             } else if (this.readyState == 4 && this.status == 401) {
                 window.location = "/login.html"
             }
         }
+
+        document.getElementById("keyrings").innerHTML = ""
 
         const url=api + 'keys';
         Http.open("GET", url);
@@ -136,9 +139,21 @@ window.onload = function() {
 
         Http.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
-                console.log("done")
             } else if (this.readyState == 4 && this.status == 401) {
                 window.location = "/login.html"
+            }
+            getKeyring()
+        }
+
+        req = {
+            Names: []
+        }
+
+        const keys = document.getElementsByClassName("keyring-checkbox");
+
+        for (let i=0; i < keys.length; i++) {
+            if (keys[i].checked) {
+                req.Names.push(keys[i].id)
             }
         }
 
@@ -146,7 +161,7 @@ window.onload = function() {
         Http.open("DELETE", url);
         Http.setRequestHeader("Authorization", localStorage.getItem("authToken"))
         Http.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-        Http.send();
+        Http.send(JSON.stringify(req));
     }
 
     function saveConfig() {
@@ -208,7 +223,6 @@ window.onload = function() {
             } else if (this.readyState == 4 && this.status == 401) {
                 window.location = "/login.html"
             }
-            modalKeyring.style.display = "none";
         }
 
         var keys = {
