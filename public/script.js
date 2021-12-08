@@ -37,9 +37,13 @@ window.onload = function() {
         console.log(e.data);
     }
     sock.onmessage = function(e) {
-        //console.log("message received: " + e.data);
-        var stdOut = document.getElementById('log');
+        let stdOut = document.getElementById('log');
         stdOut.innerHTML += ansi2html_string(ansiconf, e.data)
+
+        if (stdOut.innerHTML.length > 20000) {
+            stdOut.removeChild(stdOut.firstElementChild)
+        }
+
         stdOut.scrollTop = stdOut.scrollHeight;
     }
     sock.onerror = function(e) {

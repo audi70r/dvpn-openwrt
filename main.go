@@ -19,7 +19,7 @@ import (
 	"os/signal"
 )
 
-const version = "1.0.1"
+const version = "1.0.2"
 
 //go:embed public
 var public embed.FS
