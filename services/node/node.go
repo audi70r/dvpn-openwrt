@@ -1,7 +1,6 @@
 package node
 
 import (
-	"github.com/solarlabsteam/dvpn-openwrt/services/socket"
 	"io"
 	"os"
 	"strings"
@@ -12,10 +11,10 @@ type Node struct {
 	Online     bool
 	Pid        int
 	StartTime  time.Time
-	SocketConn *socket.Connection `json:"-"`
-	StdOut     io.ReadCloser      `json:"-"`
-	StdErr     io.ReadCloser      `json:"-"`
-	OSProcess  *os.Process        `json:"-"`
+	SocketConn *Connection   `json:"-"`
+	StdOut     io.ReadCloser `json:"-"`
+	StdErr     io.ReadCloser `json:"-"`
+	OSProcess  *os.Process   `json:"-"`
 }
 
 func New() Node {
@@ -25,7 +24,7 @@ func New() Node {
 	node.StdOut = io.NopCloser(outReader)
 	errReader := strings.NewReader("err reader")
 	node.StdErr = io.NopCloser(errReader)
-	node.SocketConn = &socket.Conn
+	node.SocketConn = &Connection{}
 
 	return node
 }

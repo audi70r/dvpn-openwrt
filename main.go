@@ -10,7 +10,6 @@ import (
 	"github.com/solarlabsteam/dvpn-openwrt/services/dvpnconf"
 	"github.com/solarlabsteam/dvpn-openwrt/services/keys"
 	"github.com/solarlabsteam/dvpn-openwrt/services/node"
-	"github.com/solarlabsteam/dvpn-openwrt/services/socket"
 	"github.com/solarlabsteam/dvpn-openwrt/utilities/appconf"
 	"io/fs"
 	"log"
@@ -19,7 +18,7 @@ import (
 	"os/signal"
 )
 
-const version = "1.0.2"
+const version = "1.0.3"
 
 //go:embed public
 var public embed.FS
@@ -78,7 +77,7 @@ func main() {
 	api.Path("/nat").HandlerFunc(controllers.GetNATInfo).Methods("GET")
 
 	// api group, that does not require authorization
-	r.HandleFunc("/api/socket", socket.Handle)
+	r.HandleFunc("/api/socket", node.Handle)
 	r.Path("/api/login").HandlerFunc(controllers.Login).Methods("POST")
 
 	// serve embedded static assets

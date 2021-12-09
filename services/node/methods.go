@@ -2,7 +2,6 @@ package node
 
 import (
 	"fmt"
-	"github.com/solarlabsteam/dvpn-openwrt/services/socket"
 	"github.com/solarlabsteam/dvpn-openwrt/utilities/appconf"
 	"io"
 	"os/exec"
@@ -60,7 +59,7 @@ func (n *Node) resetToDefaults() {
 }
 
 // stdOutToSocketBridge use the io and send its output to the provided websocket connection
-func stdOutToSocketBridge(r io.Reader, s *socket.Connection) {
+func stdOutToSocketBridge(r io.Reader, s *Connection) {
 	buf := make([]byte, 1024, 1024)
 	for {
 		n, err := r.Read(buf[:])

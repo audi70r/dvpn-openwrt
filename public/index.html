@@ -102,71 +102,79 @@
             <span class="close">&times;</span>
             <div>Edit Config</div><br/>
             <div class="config-input-fields">
-                <div class="config-save-item">
-                    <div class="label">Chain:</div>
-                    <input type="text" id="conf-gas-adj" name="conf-gas-adj"><br>
-                </div>
-                <div class="config-save-item">
-                    <div class="label">Gas:</div>
-                    <input type="text" id="conf-gas" name="conf-gas"><br>
-                </div>
-                <div class="config-save-item">
-                    <div class="label">Gas Prices:</div>
-                    <input type="text" id="conf-gas-prices" name="conf-gas-prices"><br>
-                </div>
-                <div class="config-save-item">
-                    <div class="label">Chain ID:</div>
-                    <input type="text" id="conf-chain-id" name="conf-chain-id"><br>
-                </div>
-                <div class="config-save-item">
-                    <div class="label">RPC Address:</div>
-                    <input type="text" id="conf-chain-rpc-addr" name="conf-chain-rpc-addr"><br>
-                </div>
-                <div class="config-save-item">
-                    <div class="label">Simulate and Execute:</div>
-                    <input type="checkbox" class="config-checkbox" id="conf-chain-sim-exec" name="conf-chain-sim-exec">
+
+                <div class="config-col">
+                    <div class="config-save-item">
+                        <div class="label">Chain:</div>
+                        <input type="text" id="conf-gas-adj" name="conf-gas-adj"><br>
+                    </div>
+                    <div class="config-save-item">
+                        <div class="label">Gas:</div>
+                        <input type="text" id="conf-gas" name="conf-gas"><br>
+                    </div>
+                    <div class="config-save-item">
+                        <div class="label">Gas Prices:</div>
+                        <input type="text" id="conf-gas-prices" name="conf-gas-prices"><br>
+                    </div>
+                    <div class="config-save-item">
+                        <div class="label">Chain ID:</div>
+                        <input type="text" id="conf-chain-id" name="conf-chain-id"><br>
+                    </div>
+                    <div class="config-save-item">
+                        <div class="label">RPC Address:</div>
+                        <input type="text" id="conf-chain-rpc-addr" name="conf-chain-rpc-addr"><br>
+                    </div>
+                    <div class="config-save-item">
+                        <div class="label">Simulate and Execute:</div>
+                        <input type="checkbox" class="config-checkbox" id="conf-chain-sim-exec" name="conf-chain-sim-exec">
+                    </div>
+                    <div class="config-save-item">
+                        <div class="label">Interval Set Sessions:</div>
+                        <input type="text" id="conf-node-interval-set-sessions" name="conf-node-interval-set-sessions"><br>
+                    </div>
+                    <div class="config-save-item">
+                        <div class="label">Interval Update Sessions:</div>
+                        <input type="text" id="conf-node-interval-update-sessions" name="conf-node-interval-update-sessions"><br>
+                    </div>
                 </div>
                 <!--  -->
-                <div class="config-save-item">
-                    <div class="label">Interval Set Sessions:</div>
-                    <input type="text" id="conf-node-interval-set-sessions" name="conf-node-interval-set-sessions"><br>
+
+                <div class="config-col">
+                    <div class="config-save-item">
+                        <div class="label">Interval Update Status:</div>
+                        <input type="text" id="conf-node-interval-update-status" name="conf-node-interval-update-status"><br>
+                    </div>
+                    <div class="config-save-item">
+                        <div class="label">Listen On:</div>
+                        <input type="text" id="conf-node-listen-on" name="conf-node-listen-on"><br>
+                    </div>
+                    <div class="config-save-item">
+                        <div class="label">Key name:</div>
+                        <input type="text" id="conf-chain-keyring-from" name="conf-chain-keyring-from"><br>
+                    </div>
+                    <div class="config-save-item">
+                        <div class="label">Use Handshake:</div>
+                        <input type="checkbox" class="config-checkbox" id="conf-use-handshake" name="conf-use-handshake">
+                    </div>
+                    <div class="config-save-item">
+                        <div class="label">Moniker:</div>
+                        <input type="text" id="conf-node-moniker" name="conf-node-moniker"><br>
+                    </div>
+                    <div class="config-save-item">
+                        <div class="label">Price:</div>
+                        <input type="text" id="conf-node-price" name="conf-node-price"><br>
+                    </div>
+                    <div class="config-save-item">
+                        <div class="label">Provider:</div>
+                        <input type="text" id="conf-node-provider" name="conf-node-provider"><br>
+                    </div>
+                    <div class="config-save-item">
+                        <div class="label">RemoteURL:</div>
+                        <input type="text" id="conf-node-remote-url" name="conf-node-remote-url"><br>
+                    </div>
                 </div>
-                <div class="config-save-item">
-                    <div class="label">Interval Update Sessions:</div>
-                    <input type="text" id="conf-node-interval-update-sessions" name="conf-node-interval-update-sessions"><br>
-                </div>
-                <div class="config-save-item">
-                    <div class="label">Interval Update Status:</div>
-                    <input type="text" id="conf-node-interval-update-status" name="conf-node-interval-update-status"><br>
-                </div>
-                <div class="config-save-item">
-                    <div class="label">Listen On:</div>
-                    <input type="text" id="conf-node-listen-on" name="conf-node-listen-on"><br>
-                </div>
-                <div class="config-save-item">
-                    <div class="label">Key name:</div>
-                    <input type="text" id="conf-chain-keyring-from" name="conf-chain-keyring-from"><br>
-                </div>
-                <div class="config-save-item">
-                    <div class="label">Use Handshake:</div>
-                    <input type="checkbox" class="config-checkbox" id="conf-use-handshake" name="conf-use-handshake">
-                </div>
-                <div class="config-save-item">
-                    <div class="label">Moniker:</div>
-                    <input type="text" id="conf-node-moniker" name="conf-node-moniker"><br>
-                </div>
-                <div class="config-save-item">
-                    <div class="label">Price:</div>
-                    <input type="text" id="conf-node-price" name="conf-node-price"><br>
-                </div>
-                <div class="config-save-item">
-                    <div class="label">Provider:</div>
-                    <input type="text" id="conf-node-provider" name="conf-node-provider"><br>
-                </div>
-                <div class="config-save-item">
-                    <div class="label">RemoteURL:</div>
-                    <input type="text" id="conf-node-remote-url" name="conf-node-remote-url"><br>
-                </div>
+
+
             </div>
 
             <div class="line-separator"></div>
