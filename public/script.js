@@ -6,12 +6,14 @@
 // Get the modal
     var modal = document.getElementById("modal");
     var modalKeyring = document.getElementById("modal-keyring");
+    var modalUpdates = document.getElementById("modal-updates");
 
 // Get the button that opens the modal
     var startNodeBtn = document.getElementById("start-node-link");
     var stopNodeBtn = document.getElementById("stop-node-link");
     var editConfigBtn = document.getElementById("edit-config-link");
     var editKeyringBtn = document.getElementById("edit-keyring-link");
+    var updatesBtn = document.getElementById("edit-update-link");
     var addKeyBtn = document.getElementById("add-key-btn");
 
     // Get the <span> element that closes the modal
@@ -328,6 +330,10 @@ window.onload = function() {
         modalKeyring.style.display = "block";
     }
 
+    updatesBtn.onclick = function() {
+        modalUpdates.style.display = "block";
+    }
+
     addKeyBtn.onclick = function() {
         recoverKey();
     }
@@ -337,12 +343,14 @@ window.onload = function() {
         closeBtn.onclick = function() {
             modal.style.display = "none";
             modalKeyring.style.display = "none";
+            modalUpdates.style.display = "none";
         }
     }
     for (let cancelBtn of cancelBtnElements) {
         cancelBtn.onclick = function() {
             modal.style.display = "none";
             modalKeyring.style.display = "none";
+            modalUpdates.style.display = "none";
         }
     }
 

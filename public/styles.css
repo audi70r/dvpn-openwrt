@@ -311,6 +311,30 @@ body {
     cursor: pointer;
 }
 
+.updates {
+    display: flex;
+}
+
+.updates-list {
+    display: flex;
+}
+
+.update-item {
+    flex: 1;
+}
+
+.update-menu-controls {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    margin-right: 3px;
+    font-family: "JetBrains Mono";
+}
+
+.update-menu-controls div {
+    cursor: pointer;
+}
+
 /* The Close Button */
 .close {
     color: #aaa;

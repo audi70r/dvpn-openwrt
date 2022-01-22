@@ -11,14 +11,13 @@ import (
 	"github.com/solarlabsteam/dvpn-openwrt/services/keys"
 	"github.com/solarlabsteam/dvpn-openwrt/services/node"
 	"github.com/solarlabsteam/dvpn-openwrt/utilities/appconf"
-	"io/fs"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 )
 
-const version = "1.0.3"
+const version = "1.0.4"
 
 //go:embed public
 var public embed.FS
@@ -57,11 +56,11 @@ func main() {
 	}
 
 	// for development: serve static assets from public folder
-	//publicFS := http.FileServer(http.Dir("./public"))
+	publicFS := http.FileServer(http.Dir("./public"))
 
 	// for production: embed static assets into binary
-	publicDir, _ := fs.Sub(public, "public")
-	publicFS := http.FileServer(http.FS(publicDir))
+	//publicDir, _ := fs.Sub(public, "public")
+	//publicFS := http.FileServer(http.FS(publicDir))
 
 	// api group, that requires authorization
 	api := r.PathPrefix("/api").Subrouter()
