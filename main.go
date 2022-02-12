@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/solarlabsteam/dvpn-openwrt/controllers"
-	"github.com/solarlabsteam/dvpn-openwrt/services/auth"
 	"github.com/solarlabsteam/dvpn-openwrt/services/dvpnconf"
 	"github.com/solarlabsteam/dvpn-openwrt/services/keys"
 	"github.com/solarlabsteam/dvpn-openwrt/services/node"
@@ -65,7 +64,6 @@ func main() {
 
 	// api group, that requires authorization
 	api := r.PathPrefix("/api").Subrouter()
-	api.Use(auth.Store.Authenticate)
 	api.Path("/node/start/stream").HandlerFunc(node.StartNode).Methods("GET")
 	api.Path("/node").HandlerFunc(node.GetNode).Methods("GET")
 	api.Path("/node/kill").HandlerFunc(node.KillNode).Methods("POST")
