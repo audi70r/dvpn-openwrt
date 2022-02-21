@@ -2,8 +2,6 @@ package appconf
 
 import (
 	"fmt"
-	"log"
-	"os"
 	"path"
 	"time"
 )
@@ -59,13 +57,8 @@ func LoadConf() {
 func LoadTestConf() {
 	LoadConf()
 
-	wd, err := os.Getwd()
-	if err != nil {
-		log.Println(err)
-	}
-
-	Paths.HomeDir = path.Clean(fmt.Sprintf("%s/../../temp", wd))
-	Paths.ShadowPath = path.Clean(fmt.Sprintf("%s/../../temp/shadow", wd))
+	Paths.HomeDir = path.Clean(fmt.Sprintf("./temp"))
+	Paths.ShadowPath = path.Clean(fmt.Sprintf("./temp/shadow"))
 
 	fmt.Println(Paths.HomeDir)
 	fmt.Println(Paths.ShadowPath)

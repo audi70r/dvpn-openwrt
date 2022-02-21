@@ -30,11 +30,13 @@ func main() {
 		case "version":
 			fmt.Printf("DVPN Interface version: %s\n", version)
 			os.Exit(0)
+		case "development":
+			fmt.Printf("%s\nVersion: %s", "DVPN Interface running in development mode", version)
+			appconf.LoadTestConf()
+		default:
+			appconf.LoadConf()
 		}
 	}
-
-	// load config
-	appconf.LoadConf()
 
 	// load configurations
 	if confErr := dvpnconf.LoadConfig(); confErr != nil {
