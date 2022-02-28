@@ -79,3 +79,7 @@ func (p *PathsConf) WireGuardConfigFullPath() string {
 func (p *PathsConf) CertificateFullPath() string {
 	return fmt.Sprintf("%v%v%v", p.HomeDir, p.SentinelDir, p.CertificatePath)
 }
+
+func (p *PathsConf) CertificateDir() string {
+	return fmt.Sprintf("%v%v", p.HomeDir, p.SentinelDir)
+}
