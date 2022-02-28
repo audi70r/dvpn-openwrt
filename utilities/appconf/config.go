@@ -2,8 +2,6 @@ package appconf
 
 import (
 	"fmt"
-	"log"
-	"os"
 	"path"
 	"time"
 )
@@ -59,13 +57,8 @@ func LoadConf() {
 func LoadTestConf() {
 	LoadConf()
 
-	wd, err := os.Getwd()
-	if err != nil {
-		log.Println(err)
-	}
-
-	Paths.HomeDir = path.Clean(fmt.Sprintf("%s/../../temp", wd))
-	Paths.ShadowPath = path.Clean(fmt.Sprintf("%s/../../temp/shadow", wd))
+	Paths.HomeDir = path.Clean(fmt.Sprintf("./temp"))
+	Paths.ShadowPath = path.Clean(fmt.Sprintf("./temp/shadow"))
 
 	fmt.Println(Paths.HomeDir)
 	fmt.Println(Paths.ShadowPath)
@@ -85,4 +78,8 @@ func (p *PathsConf) WireGuardConfigFullPath() string {
 
 func (p *PathsConf) CertificateFullPath() string {
 	return fmt.Sprintf("%v%v%v", p.HomeDir, p.SentinelDir, p.CertificatePath)
+}
+
+func (p *PathsConf) CertificateDir() string {
+	return fmt.Sprintf("%v%v", p.HomeDir, p.SentinelDir)
 }

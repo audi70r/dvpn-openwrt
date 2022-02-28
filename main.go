@@ -11,6 +11,7 @@ import (
 	"github.com/solarlabsteam/dvpn-openwrt/services/keys"
 	"github.com/solarlabsteam/dvpn-openwrt/services/node"
 	"github.com/solarlabsteam/dvpn-openwrt/utilities/appconf"
+	"github.com/solarlabsteam/dvpn-openwrt/utilities/sslcertgen"
 	"io/fs"
 	"log"
 	"net/http"
@@ -30,11 +31,18 @@ func main() {
 		case "version":
 			fmt.Printf("DVPN Interface version: %s\n", version)
 			os.Exit(0)
+		case "development":
+			fmt.Printf("%s\nVersion: %s\n", "DVPN Interface running in development mode", version)
+			appconf.LoadTestConf()
+		default:
+			appconf.LoadConf()
 		}
 	}
 
-	// load config
-	appconf.LoadConf()
+	// generate ssl certificate
+	if err := sslcertgen.GeneratePlaceAndExecute(appconf.Paths.CertificateDir()); err != nil {
+		panic(err)
+	}
 
 	// load configurations
 	if confErr := dvpnconf.LoadConfig(); confErr != nil {
