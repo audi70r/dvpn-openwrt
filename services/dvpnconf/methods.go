@@ -41,6 +41,9 @@ func LoadConfig() error {
 	Config.ConfPath = appconf.Paths.DVPNConfigFullPath()
 	fmt.Println(appconf.Paths.DVPNConfigFullPath())
 	confBytes, readErr := os.ReadFile(Config.ConfPath)
+	if readErr != nil {
+		return readErr
+	}
 
 	// init wireguard.toml config, and initiate it if it's not found
 	wgConfigPath := appconf.Paths.WireGuardConfigFullPath()
@@ -92,17 +95,6 @@ func LoadConfig() error {
 	return nil
 }
 
-func GetConfigs() (config []byte, err error) {
-	tlsCertPath := appconf.Paths.CertificateFullPath()
-	_, readErr := ioutil.ReadFile(tlsCertPath)
-
-	if readErr != nil {
-		return generateCertificate()
-	}
-
-	return config, err
-}
-
 func (c *Configurations) PostConfig(config dVPNConfig) (resp []byte, err error) {
 	configPath := appconf.Paths.DVPNConfigFullPath()
 	configBytes, err := toml.Marshal(config)
@@ -136,16 +128,4 @@ func initWireguardConfig() (err error) {
 	}
 
 	return nil
-}
-
-func generateCertificate() (config []byte, err error) {
-	cmd := exec.Command(node.BinSH, os.Getenv("HOME")+node.SHGenerateCertPath)
-
-	err = cmd.Run()
-
-	if err != nil {
-		return config, err
-	}
-
-	return GetConfigs()
 }
