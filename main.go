@@ -34,8 +34,12 @@ func main() {
 			fmt.Printf("%s\nVersion: %s\n", "DVPN Interface running in development mode", version)
 			appconf.LoadTestConf()
 		default:
+			fmt.Printf("Loading default configuration\n")
 			appconf.LoadConf()
 		}
+	} else {
+		fmt.Printf("Loading default configuration\n")
+		appconf.LoadConf()
 	}
 
 	// generate ssl certificate
