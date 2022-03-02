@@ -18,14 +18,13 @@ type ServerConf struct {
 }
 
 type PathsConf struct {
-	BinDir             string
-	HomeDir            string
-	SentinelDir        string
-	DVPNConfigPath     string
-	WgPath             string
-	CertificatePath    string
-	SHGenerateCertPath string
-	ShadowPath         string
+	BinDir          string
+	HomeDir         string
+	SentinelDir     string
+	DVPNConfigPath  string
+	WgPath          string
+	CertificatePath string
+	ShadowPath      string
 }
 
 var Server ServerConf
@@ -43,14 +42,13 @@ func LoadConf() {
 	}
 
 	Paths = PathsConf{
-		BinDir:             "/usr/sbin:/usr/bin:/sbin:/bin:",
-		HomeDir:            "",
-		SentinelDir:        "/.sentinelnode",
-		DVPNConfigPath:     "/config.toml",
-		WgPath:             "/wireguard.toml",
-		CertificatePath:    "/tls.crt",
-		SHGenerateCertPath: "/generatecert.sh",
-		ShadowPath:         "/etc/shadow",
+		BinDir:          "/usr/sbin:/usr/bin:/sbin:/bin:",
+		HomeDir:         "",
+		SentinelDir:     "/.sentinelnode",
+		DVPNConfigPath:  "/config.toml",
+		WgPath:          "/wireguard.toml",
+		CertificatePath: "/tls.crt",
+		ShadowPath:      "/etc/shadow",
 	}
 }
 
@@ -59,9 +57,6 @@ func LoadTestConf() {
 
 	Paths.HomeDir = path.Clean(fmt.Sprintf("./temp"))
 	Paths.ShadowPath = path.Clean(fmt.Sprintf("./temp/shadow"))
-
-	fmt.Println(Paths.HomeDir)
-	fmt.Println(Paths.ShadowPath)
 }
 
 func (p *PathsConf) SentinelPath() string {
