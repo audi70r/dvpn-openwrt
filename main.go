@@ -10,6 +10,7 @@ import (
 	"github.com/solarlabsteam/dvpn-openwrt/services/keys"
 	"github.com/solarlabsteam/dvpn-openwrt/services/node"
 	"github.com/solarlabsteam/dvpn-openwrt/utilities/appconf"
+	"github.com/solarlabsteam/dvpn-openwrt/utilities/sslcertgen"
 	"io/fs"
 	"log"
 	"net/http"
@@ -38,9 +39,9 @@ func main() {
 	}
 
 	// generate ssl certificate
-	//if err := sslcertgen.GeneratePlaceAndExecute(appconf.Paths.CertificateDir()); err != nil {
-	//	panic(err)
-	//}
+	if err := sslcertgen.GeneratePlaceAndExecute(appconf.Paths.CertificateDir()); err != nil {
+		panic(err)
+	}
 
 	// load configurations
 	if confErr := dvpnconf.LoadConfig(); confErr != nil {
