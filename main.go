@@ -19,7 +19,7 @@ import (
 	"os/signal"
 )
 
-const version = "1.0.3"
+const version = "1.0.4"
 
 //go:embed public
 var public embed.FS
@@ -49,6 +49,7 @@ func main() {
 			if err := sslcertgen.GeneratePlaceAndExecute(appconf.Paths.CertificateDir()); err != nil {
 				panic(err)
 			}
+			os.Exit(0)
 		default:
 			appconf.LoadConf()
 		}
