@@ -39,28 +39,10 @@ var Config Configurations
 
 func LoadConfig() error {
 	Config.ConfPath = appconf.Paths.DVPNConfigFullPath()
-	fmt.Println(appconf.Paths.DVPNConfigFullPath())
 	confBytes, readErr := os.ReadFile(Config.ConfPath)
-	if readErr != nil {
-		return readErr
-	}
-
-	// init wireguard.toml config, and initiate it if it's not found
-	wgConfigPath := appconf.Paths.WireGuardConfigFullPath()
-	_, readErr = ioutil.ReadFile(wgConfigPath)
-
-	if readErr != nil {
-		if wireguardErr := initWireguardConfig(); wireguardErr != nil {
-			return wireguardErr
-		}
-	}
 
 	// if config does not exist, create an empty config
 	if readErr != nil {
-		if err := os.MkdirAll(appconf.Paths.SentinelPath(), os.ModePerm); err != nil {
-			return err
-		}
-
 		natInfo, err := gochecknat.GetNATInfo()
 		if err != nil {
 			return err
@@ -88,6 +70,16 @@ func LoadConfig() error {
 		return err
 	}
 
+	// init wireguard.toml config, and initiate it if it's not found
+	wgConfigPath := appconf.Paths.WireGuardConfigFullPath()
+	_, readErr = ioutil.ReadFile(wgConfigPath)
+
+	if readErr != nil {
+		if wireguardErr := initWireguardConfig(); wireguardErr != nil {
+			return wireguardErr
+		}
+	}
+
 	if unmarshalErr := toml.Unmarshal(confBytes, &Config.DVPN); unmarshalErr != nil {
 		return unmarshalErr
 	}
@@ -103,7 +95,7 @@ func (c *Configurations) PostConfig(config dVPNConfig) (resp []byte, err error) 
 		return resp, err
 	}
 
-	if err = ioutil.WriteFile(configPath, configBytes, 0644); err != nil {
+	if err = ioutil.WriteFile(configPath, configBytes, 0755); err != nil {
 		return resp, err
 	}
 

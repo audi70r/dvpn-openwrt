@@ -19,7 +19,7 @@ import (
 	"os/signal"
 )
 
-const version = "1.0.4"
+const version = "1.0.5"
 
 //go:embed public
 var public embed.FS
@@ -53,6 +53,11 @@ func main() {
 		default:
 			appconf.LoadConf()
 		}
+	}
+
+	// ensure sentinel directory exists
+	if createErr := appconf.EnsureDir(appconf.Paths.SentinelPath()); createErr != nil {
+		panic(createErr)
 	}
 
 	// generate ssl certificate

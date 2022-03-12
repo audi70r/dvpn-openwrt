@@ -1,7 +1,9 @@
 package appconf
 
 import (
+	"errors"
 	"fmt"
+	"os"
 	"path"
 	"time"
 )
@@ -59,9 +61,6 @@ func LoadTestConf() {
 
 	Paths.HomeDir = path.Clean(fmt.Sprintf("./temp"))
 	Paths.ShadowPath = path.Clean(fmt.Sprintf("./temp/shadow"))
-
-	fmt.Println(Paths.HomeDir)
-	fmt.Println(Paths.ShadowPath)
 }
 
 func (p *PathsConf) SentinelPath() string {
@@ -82,4 +81,23 @@ func (p *PathsConf) CertificateFullPath() string {
 
 func (p *PathsConf) CertificateDir() string {
 	return fmt.Sprintf("%v%v", p.HomeDir, p.SentinelDir)
+}
+
+func EnsureDir(dirName string) error {
+	err := os.MkdirAll(dirName, 0755)
+	if err == nil {
+		return nil
+	}
+	if os.IsExist(err) {
+		// check that the existing path is a directory
+		info, err := os.Stat(dirName)
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() {
+			panic(errors.New("path exists but is not a directory"))
+		}
+		return nil
+	}
+	return err
 }
