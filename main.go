@@ -34,6 +34,21 @@ func main() {
 		case "development":
 			fmt.Printf("%s\nVersion: %s\n", "DVPN Interface running in development mode", version)
 			appconf.LoadTestConf()
+		case "paths":
+			fmt.Printf("DVPN Interface version: %s\n", version)
+			appconf.LoadConf()
+			fmt.Printf("%s\n", appconf.Paths)
+			fmt.Printf("Sentinel Path: %s\n", appconf.Paths.SentinelPath())
+			fmt.Printf("Certificate Dir: %s\n", appconf.Paths.CertificateDir())
+			fmt.Printf("Certificate Path: %s\n", appconf.Paths.CertificateFullPath())
+			fmt.Printf("DVPN Config Path: %s\n", appconf.Paths.DVPNConfigFullPath())
+			fmt.Printf("Wireguard Config Path: %s\n", appconf.Paths.WireGuardConfigFullPath())
+			os.Exit(0)
+		case "generatecert":
+			appconf.LoadConf()
+			if err := sslcertgen.GeneratePlaceAndExecute(appconf.Paths.CertificateDir()); err != nil {
+				panic(err)
+			}
 		default:
 			appconf.LoadConf()
 		}
