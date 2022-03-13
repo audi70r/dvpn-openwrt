@@ -10,6 +10,7 @@ import (
 	"github.com/solarlabsteam/dvpn-openwrt/services/dvpnconf"
 	"github.com/solarlabsteam/dvpn-openwrt/services/keys"
 	"github.com/solarlabsteam/dvpn-openwrt/services/node"
+	"github.com/solarlabsteam/dvpn-openwrt/services/wg"
 	"github.com/solarlabsteam/dvpn-openwrt/utilities/appconf"
 	"github.com/solarlabsteam/dvpn-openwrt/utilities/sslcertgen"
 	"io/fs"
@@ -19,7 +20,7 @@ import (
 	"os/signal"
 )
 
-const version = "1.0.6"
+const version = "1.0.7"
 
 //go:embed public
 var public embed.FS
@@ -79,6 +80,9 @@ func main() {
 
 	// load node
 	node := node.New()
+
+	// initiate wireguard config
+	go wg.InitWG()
 
 	r := mux.NewRouter()
 

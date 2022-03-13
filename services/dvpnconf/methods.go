@@ -4,13 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/audi70r/gochecknat"
-	"github.com/solarlabsteam/dvpn-openwrt/services/node"
+	"github.com/pelletier/go-toml"
 	"github.com/solarlabsteam/dvpn-openwrt/utilities/appconf"
 	"io/ioutil"
 	"os"
-	"os/exec"
-
-	"github.com/pelletier/go-toml"
 )
 
 const (
@@ -70,16 +67,6 @@ func LoadConfig() error {
 		return err
 	}
 
-	// init wireguard.toml config, and initiate it if it's not found
-	wgConfigPath := appconf.Paths.WireGuardConfigFullPath()
-	_, readErr = ioutil.ReadFile(wgConfigPath)
-
-	if readErr != nil {
-		if wireguardErr := initWireguardConfig(); wireguardErr != nil {
-			return wireguardErr
-		}
-	}
-
 	if unmarshalErr := toml.Unmarshal(confBytes, &Config.DVPN); unmarshalErr != nil {
 		return unmarshalErr
 	}
@@ -90,7 +77,6 @@ func LoadConfig() error {
 func (c *Configurations) PostConfig(config dVPNConfig) (resp []byte, err error) {
 	configPath := appconf.Paths.DVPNConfigFullPath()
 	configBytes, err := toml.Marshal(config)
-
 	if err != nil {
 		return resp, err
 	}
@@ -100,7 +86,6 @@ func (c *Configurations) PostConfig(config dVPNConfig) (resp []byte, err error) 
 	}
 
 	resp, err = json.Marshal(config)
-
 	if err != nil {
 		return resp, err
 	}
@@ -108,16 +93,4 @@ func (c *Configurations) PostConfig(config dVPNConfig) (resp []byte, err error) 
 	c.DVPN = config
 
 	return resp, err
-}
-
-func initWireguardConfig() (err error) {
-	cmd := exec.Command(node.DVPNNodeExec, node.DVPNNodeWireguard, node.DVPNNodeConfig, node.DVPNNodeInit, appconf.DVPNNodeHomeDirParam, appconf.Paths.SentinelPath())
-
-	err = cmd.Run()
-
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
